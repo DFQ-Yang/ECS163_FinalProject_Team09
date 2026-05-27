@@ -6,13 +6,32 @@
 <html style="width:100%;height:100%;">
 <body style="width:100%;height:100%;margin: 0;">
     <div id="app">
+        <div class="graph_map">
 
+        </div>
     </div>
+
+    <style>
+        .graph_map{
+            width: 100%;
+            height: 85vh;
+            border: 1px solid transparent;
+            overflow: hidden;
+            display: flex;
+            gap: 0vw;
+            overflow-x: auto;
+            background-color: aqua;
+        }
+    </style>
 </body>
+
 
 <!-- import d3js and vue packs -->
 <script src="https://d3js.org/d3.v5.min.js"></script>
 <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+<script src="https://unpkg.com/topojson-client@3"></script>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/echarts/map/js/world.js"></script>
 
 <script type="module" src="./js/main.js"></script>
 </html>
