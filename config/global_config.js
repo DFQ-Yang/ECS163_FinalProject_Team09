@@ -1,5 +1,5 @@
-//Decoupling makes easy to manage variables
 export const global_config = {
-    helloGlobal: "helloGlobal",
-    helloVue3: "helloVue3"
+    data_path: "extinction.csv",
+    continent_path:"continents2.csv",
+    NClass_name_col: "class_name",
 }

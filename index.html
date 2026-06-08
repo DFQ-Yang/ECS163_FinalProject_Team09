@@ -1,37 +1,831 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
+<html lang="en">
 <head>
     <meta charset="utf-8">
-    <title></title>
-</head>
-<html style="width:100%;height:100%;">
-<body style="width:100%;height:100%;margin: 0;">
-    <div id="app">
-        <div class="graph_map">
-
-        </div>
-    </div>
+    <title>The Silent Departure | A Chronicle of Biodiversity Loss</title>
 
     <style>
-        .graph_map{
-            width: 100%;
-            height: 85vh;
-            border: 1px solid transparent;
-            overflow: hidden;
+        /* ======================================================
+           GLOBAL STYLE & THEME
+           ====================================================== */
+        * { box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            margin: 0;
+            background: #08080a; /* Deepened the black for higher contrast */
+            color: #d1d1d1;
+            font-family: "Inter", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            overflow-x: hidden;
+            line-height: 1.8;
+        }
+
+        strong { color: #ff4d4d; font-weight: 600; }
+        em { color: #888; font-style: italic; }
+
+        /* ======================================================
+           IMMERSIVE HERO SECTION
+           ====================================================== */
+        .hero {
+            min-height: 100vh;
             display: flex;
-            gap: 0vw;
-            overflow-x: auto;
-            background-color: aqua;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 0 10%;
+            text-align: center;
+            background: 
+                linear-gradient(to bottom, rgba(8,8,10,0.4) 0%, rgba(8,8,10,1) 95%),
+                url("images/hero-background.jpg") center/cover no-repeat;
+        }
+
+        .hero h1 {
+            margin: 0;
+            font-size: clamp(3rem, 8vw, 5.5rem);
+            font-weight: 800;
+            letter-spacing: -3px;
+            color: #fff;
+            text-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .hero-subtitle {
+            margin-top: 20px;
+            font-size: 1.1rem;
+            color: #ff4d4d;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        .story-block {
+            max-width: 800px;
+            margin-top: 60px;
+            font-size: 1.25rem;
+            color: #b0b0b0;
+            font-weight: 300;
+        }
+
+        .story-image {
+            width: 500px;
+            max-width: 90%;
+            border-radius: 4px;
+            margin: 50px 0;
+            filter: grayscale(30%);
+            transition: filter 0.5s ease;
+            box-shadow: 0 30px 100px rgba(0,0,0,0.8);
+        }
+        .story-image:hover { filter: grayscale(0%); }
+
+        /* ======================================================
+           THE DATA MISSION (Replaces "Dataset Note")
+           ====================================================== */
+        .mission-statement {
+            margin-top: 60px;
+            max-width: 800px;
+            padding: 40px;
+            border-left: 2px solid #ff4d4d;
+            background: rgba(255,255,255,0.02);
+            text-align: left;
+        }
+
+        .mission-statement h3 {
+            margin-top: 0;
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #fff;
+        }
+
+        /* ======================================================
+           NARRATIVE SECTIONS
+           ====================================================== */
+        section {
+            padding: 120px 8%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .section-intro {
+            max-width: 800px;
+            margin-bottom: 60px;
+            text-align: center;
+        }
+
+        .section-intro h2 {
+            margin-bottom: 20px;
+            font-size: 3rem;
+            color: #fff;
+            letter-spacing: -1.5px;
+        }
+
+        .section-intro p {
+            font-size: 1.15rem;
+            color: #999;
+        }
+
+        /* ======================================================
+           CHART CANVAS
+           ====================================================== */
+        .chart-container {
+            width: 100%;
+            max-width: 1400px;
+            height: 75vh;
+            position: relative;
+            background: #0d0d0f;
+            border: 1px solid #1a1a1c;
+            border-radius: 8px;
+            box-shadow: inset 0 0 50px rgba(0,0,0,0.5);
+        }
+
+        /* ==================== SANKEY VISUAL RESET START ==================== */
+        #sankey-container {
+            width: 100%;
+            max-width: 1400px;
+            height: 75vh;
+            background: #ffffff;
+            border-color: #e5e5e5;
+            border-radius: 8px;
+            box-shadow: none;
+            color: #111111;
+            overflow: hidden;
+        }
+
+        #sankey-container iframe {
+            display: block;
+            width: 100%;
+            height: 100%;
+            border: 0;
+            background: #ffffff;
+        }
+
+        #sankey-section .section-intro {
+            margin-bottom: 40px;
+        }
+        /* ==================== SANKEY VISUAL RESET END ==================== */
+
+        /* ==================== TIMELINE MULTILINE START ==================== */
+        #timeline-container {
+            padding: 24px;
+            overflow: visible;
+        }
+
+        #timeline-container .timeline-shell {
+            height: 100%;
+            display: grid;
+            grid-template-columns: minmax(0, 1.45fr) minmax(280px, 0.75fr);
+            gap: 24px;
+        }
+
+        #timeline-container .chart-holder {
+            position: relative;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        #multiline-controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px 14px;
+            color: #d7d7d7;
+            font-size: 13px;
+            position: relative;
+            z-index: 5;
+        }
+
+        #multiline-controls .line-control {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+        }
+
+        #multiline-controls input {
+            accent-color: #ff4d4d;
+        }
+
+        #multiline-controls .line-color {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        #multiline-chart {
+            width: 100%;
+            min-height: 0;
+            flex: 1;
+        }
+
+        #multiline-tooltip {
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+            padding: 8px 10px;
+            background: rgba(10, 10, 12, 0.96);
+            color: #ffffff;
+            border: 1px solid rgba(255,255,255,0.18);
+            border-radius: 4px;
+            font-size: 12px;
+            z-index: 10;
+        }
+
+        #timeline-container .chart-grid line {
+            stroke: rgba(255,255,255,0.08);
+        }
+
+        #timeline-container .chart-axis path,
+        #timeline-container .chart-axis line {
+            stroke: rgba(255,255,255,0.35);
+        }
+
+        #timeline-container .chart-axis text,
+        #timeline-container .axis-title {
+            fill: #bdbdbd;
+        }
+
+        #timeline-container .line-path {
+            fill: none;
+            stroke-width: 2.5;
+        }
+
+        #timeline-container .line-dot {
+            cursor: pointer;
+            stroke: #0d0d0f;
+            stroke-width: 1.5;
+        }
+
+        #timeline-container .peak-line {
+            stroke: rgba(255,77,77,0.55);
+            stroke-dasharray: 4 4;
+        }
+
+        #timeline-container .peak-text {
+            fill: #ff7b7b;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        #species-details {
+            overflow-y: auto;
+            padding: 18px;
+            border-left: 1px solid rgba(255,255,255,0.12);
+            color: #d7d7d7;
+            background: rgba(255,255,255,0.025);
+            border-radius: 6px;
+        }
+
+        #species-details h3 {
+            margin: 0 0 8px;
+            color: #ffffff;
+            font-size: 18px;
+        }
+
+        #species-details p {
+            margin: 6px 0;
+            color: #a9a9a9;
+            line-height: 1.45;
+            font-size: 13px;
+        }
+
+        #species-details .species-list {
+            display: grid;
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        #species-details .species-card {
+            padding: 10px 12px;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 6px;
+            background: rgba(0,0,0,0.18);
+            cursor: pointer;
+            transition: border-color 160ms ease, transform 160ms ease;
+        }
+
+        #species-details .species-card:hover {
+            border-color: rgba(255,77,77,0.75);
+            transform: translateY(-1px);
+        }
+
+        #species-details h4 {
+            margin: 0 0 4px;
+            color: #ffffff;
+            font-size: 14px;
+        }
+
+        #species-details .scientific-name {
+            color: #ffb0b0;
+            font-style: italic;
+        }
+
+        #species-details .page-controls {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            margin-top: 12px;
+            font-size: 12px;
+        }
+
+        #species-details button {
+            border: 1px solid rgba(255,255,255,0.18);
+            background: rgba(255,255,255,0.08);
+            color: #ffffff;
+            border-radius: 4px;
+            padding: 5px 9px;
+            cursor: pointer;
+        }
+
+        #species-details button:disabled {
+            opacity: 0.35;
+            cursor: default;
+        }
+        /* ==================== TIMELINE MULTILINE END ==================== */
+
+        /* ======================================================
+           MAP CONFIG
+           ====================================================== */
+        #map-container {
+            touch-action: none;
+        }
+
+        .map-filter{
+            position: absolute;
+
+            top: 145px;
+            right: 60px;
+
+            z-index: 999;
+            width: 200px;
+            max-height: 400px;
+            overflow-y: auto;
+
+            background: rgba(255, 255, 255, 0.95);
+            padding: 15px;
+            border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .map-checkbox {
+            pointer-events: auto;
+        }
+
+        .switch-button{
+            position: absolute;
+
+            top: 20px;
+            left: 20px;
+
+            z-index: 1001;
+            width: 40px;
+            height: 40px;
+
+            border-radius: 50%;
+            border-width: 1px;
+        }
+
+        .filter-button{
+            position: absolute;
+            top: 100px;
+            right: 20px;
+            z-index: 1001;
+
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border-width: 1px;
+        }
+
+        .refresh-button{
+            position: absolute;
+            top: 80px;
+            left: 20px;
+            z-index: 1010;
+
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border-width: 1px;
+        }
+
+        .switch-title{
+            position: absolute;
+            top: 20px;
+            left: 80px;
+            z-index: 998;
+            font-size: larger;
+            color: white;
+        }
+
+        #map-sidebar{
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 380px;
+            height: 70vh;
+            z-index: 999;
+            background-color: #0d1b2a;
+            opacity: 0.6;
+            overflow-y: auto; 
+            box-sizing: border-box;
+        }
+        
+        .sidebar-hide{
+            transform: translateX(120%);
+            opacity: 0;
+            display: none;
+            pointer-events: none;
+        }
+
+        /* Since may have duplicate sidebar, so my original one would be move far away from window 700% */
+        .sidebar-active{
+            transform: translateX(700%);
+            opacity: 1;
+            display:block;
+            pointer-events: all;
+        }
+        #close-sidebar-but{
+            position: relative;
+            z-index: 1000;
+        }
+        /* ======================================================
+           TRANSITION QUOTES
+           ====================================================== */
+        .narrative-bridge {
+            padding: 100px 0;
+            max-width: 700px;
+            margin: 0 auto;
+            text-align: center;
+            font-style: italic;
+            font-size: 1.5rem;
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .narrative-bridge b { color: #ff4d4d; font-style: normal; }
+
+        /* ======================================================
+           FOOTER
+           ====================================================== */
+        footer {
+            padding: 100px 10%;
+            border-top: 1px solid #1a1a1c;
+            text-align: center;
+            color: #444;
+            font-size: 0.9rem;
+        }
+
+        /* Tooltip */
+        #tooltip {
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+            padding: 15px;
+            background: rgba(10, 10, 12, 0.95);
+            border: 1px solid #ff4d4d;
+            color: white;
+            font-size: 13px;
+            border-radius: 2px;
+            z-index: 1000;
+        }
+
+        .scroll-hint {
+            margin-top: 40px;
+            color: #444;
+            letter-spacing: 3px;
+            font-size: 0.75rem;
+            text-transform: uppercase;
         }
     </style>
+</head>
+
+<body>
+
+    <header class="hero">
+        <div class="hero-subtitle">The Sixth Mass Extinction</div>
+        <h1>The Silent Departure</h1>
+
+        <div class="story-block">
+            <p>
+                Extinction is often reduced to a statistic line on a graph or a percentage in a report. 
+                But every data point represents a <strong>silent departure</strong> from the canvas of our world.
+            </p>
+
+            <p>
+                In 1970, the <strong>Spoon-billed Sandpiper</strong> was a familiar sight across Asia’s tidal flats.
+                Today it is among the rarest birds on Earth.
+                With fewer than <strong>450 individuals</strong> believed to remain globally,
+                this tiny migratory shorebird stands at the edge of extinction.
+            </p>
+
+            <p>
+                Recent conservation concerns is brought by the proposed G228 project of land reclamation
+                near Beihai, one of its critical stopover habitats along the Chinese coast.
+                For a species already struggling to survive,
+                the loss of even a single resting and feeding ground may carry consequences
+                far beyond what numbers can express.
+
+                
+            </p>
+
+            <img src="images/sandpiper.jpg" class="story-image" alt="Spoon-billed Sandpiper">
+
+
+            <p>
+                This inspired a broader question:
+                How do species disappear?
+                Is extinction the result of a single event,
+                or the accumulation of pressures across time, geography, and ecosystems?
+            </p>
+
+            <p>
+
+                It is not just the story of one bird. It is a chronicle of a planet in transition. 
+                We invite you to explore the data behind the loss from the <strong>acceleration of time</strong> 
+                to the <strong>roots of human impact</strong>.
+            </p>
+        </div>
+
+        <div class="mission-statement">
+            <h3>Our Methodology</h3>
+            <p>
+                Our narrative is built upon the <span class="highlight">IUCN Red List</span>, the world's most comprehensive 
+                inventory of the global conservation status of biological species. We filtered over <strong>159,000 records</strong> 
+                to isolate 350+ animal species with confirmed extinction status and geographical data. This data reveals 
+                not just a loss of life, but a breakdown of an <span class="highlight">interconnected living system</span>.
+            </p>
+        </div>
+
+        <div class="scroll-hint">Scroll to witness the timeline ↓</div>
+    </header>
+
+    <section id="timeline-section">
+        <div class="section-intro">
+            <h2>The Pace of Loss</h2>
+            <p>
+                The pace of disappearance is no longer gradual. As we entered the 21st century, the 
+                frequency of extinction assessments reached a fever pitch. 
+            </p>
+        </div>
+        <div id="timeline-container" class="chart-container">
+            <div class="timeline-shell">
+                <div class="chart-holder">
+                    <div id="multiline-controls"></div>
+                    <svg id="multiline-chart"></svg>
+                    <div id="multiline-tooltip"></div>
+                </div>
+                <div id="species-details">
+                    <h3>Select a timeline point</h3>
+                    <p>Click a dot to inspect extinct species records for that year and group.</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="narrative-bridge">
+            "Loss is not just a matter of time; it is a matter of <b>place</b>."
+        </div>
+    </section>
+
+    <section id="map-section">
+        <div class="section-intro">
+            <h2>Mapping the Void</h2>
+            <p>
+                Extinction leaves a scar on the map. From the isolated islands of the Pacific to the 
+                industrial heartlands of the West, the geography of loss reveals the heavy 
+                footprint of human expansion.
+            </p>
+        </div>
+        <div class="chart-container">
+            <svg id="map-container" width="100%" height="100%">
+                <g class="map-base"></g>
+                <g class="map-overlay" style="display: none;"></g>
+            </svg>
+            <button class="switch-button" @click.stop="handle_view_mode_change">
+                <img src="./images/switch.png" width="75%" height="75%">
+            </button>
+            <button class="filter-button"  @click.stop="show_filter = !show_filter">
+                <img src="./images/filter.png" width="100%" height="75%">
+            </button>
+            <button class="refresh-button" @click.stop="map_refresh">
+                <img src="./images/refresh.png" width="100%" height="75%">
+            </button>
+            <div id="map-sidebar" class="sidebar-hide">
+                <button id="close-sidebar-but" @click.stop="close_side_bar()">✕</button>
+                <h2 id="sb-name">unknown</h2>
+                <div>TaxonID: <span id="sb-id">unknown</span></div>
+                <div>Country: <span id="sb-country">unknown</span></div>
+                <div>Status: EXTINCT</div>
+                <div>Last Seen Info: <span id="sb-year">unknown</span></div>
+                <div>Category: <span id="sb-category">unknown</span></div>
+                <div>Threaten: <span id="sb-threaten">unknown</span></div>
+            </div>
+            <div class="switch-title">{{view_mode ? "country-view" : "region-view"}}</div>
+            <div class="map-filter" v-show="show_filter">
+                <el-checkbox-group v-model="filter_mode" @change="handle_filter_change" >
+                    <el-checkbox 
+                        v-for="item in Array.from(filter_mode_set)" 
+                        :key="item" 
+                        :label="item">
+                        {{ item }}
+                    </el-checkbox>
+                </el-checkbox-group>
+            </div>
+
+        <div class="narrative-bridge">
+            "To understand who we are losing, we must look at the <b>tree of life</b> itself."
+        </div>
+        </div>
+        
+    </section>
+
+    <section id="sankey-section">
+        <div class="section-intro">
+            <h2>The Weight of the Branches</h2>
+            <p>
+                Some lineages are more fragile than others. By tracing the flow from Phylum to Family, 
+                we see which branches of the biological tree are being pruned away forever.
+            </p>
+        </div>
+        <div id="sankey-container" class="chart-container">
+            <iframe
+                title="Species Extinction Sankey Diagram"
+                src="sankey_local/index.html?v=cross6">
+            </iframe>
+        </div>
+
+        <div class="narrative-bridge">
+            "Finally, we must ask the most difficult question: <b>Why?</b>"
+        </div>
+    </section>
+
+    <section id="bubble-section">
+        <div class="section-intro">
+            <h2>The Architecture of Threats</h2>
+            <p>
+                Explore the forces driving biodiversity loss.
+                From habitat destruction to invasive species,
+                each circle reveals a pathway from human pressure
+                to biological consequence.
+                Drill down from cause to class and ultimately to individual species.
+            </p>
+        </div>
+        <div id="bubble-container" class="chart-container"></div>
+        
+        <div class="story-block" style="text-align:center; margin: 80px auto;">
+            <p>
+                The story of the Spoon-billed Sandpiper reminds us that extinction is rarely caused by a single dramatic event.
+                More often, it emerges through a series of decisions about what we choose to build, protect, or overlook.
+            </p>
+
+            <p>
+                In the case of the proposed G228 project near Beihai, one frequently suggested solution has been remarkably modest:
+                shifting the route approximately one kilometer inland to avoid critical wetland habitat used by migratory birds.
+            </p>
+
+            <p>
+                Sometimes a small change can make a significant difference.
+                The Spoon-billed Sandpiper—and the many species that share its wetlands—are still waiting for our answer.
+            </p>
+        </div>
+    </section>
+
+    <footer>
+        <p>A Narrative Data Visualization by Group 09</p>
+        <p>Xinyi Li / Qi Gao / Dehui Chen / Logan Fleming / Junsong Cai</p>
+        <p><em>Data sourced from the IUCN Red List of Threatened Species.</em></p>
+    </footer>
+
+    <div id="tooltip"></div>
+
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/d3-sankey@0.12.3/dist/d3-sankey.min.js"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://unpkg.com/topojson-client@3"></script>
+    <link rel="stylesheet" href="https://unpkg.com/element-plus/dist/index.css" />
+    <script src="https://unpkg.com/element-plus"></script>
+    <script src="local-image-map.js?v=generic1"></script>
+    <script src="species-image-map.js?v=species3"></script>
+    <script src="js/cross_graph.js?v=drag4"></script>
+    <script src="js/timeline.js?v=cross7"></script>
+    <script src="js/bubble.js?v=cross7"></script>
+    <script type = "module">
+        import {draw_map} from "./js/map.js";
+        import { global_config } from './config/global_config.js';
+        const {createApp} = Vue
+        const app = createApp({
+            //store data that needs to use in html, used for dynamic web design
+            data(){
+                return{
+                    // view_mode true: country_view, false:region_view
+                    view_mode: true,
+                    show_filter: false,
+                    filter_mode: [],
+                    filter_mode_set: new Set(),
+                    resize_timer: null
+                }
+            },
+            //things to run when the web initially opened
+            mounted(){
+                this.parse_filter();
+                draw_map(false, this.filter_mode, this.view_mode);
+                window.addEventListener("resize", this.handle_resize);
+            },
+            //methods triggered from html, such as @click.
+            methods:{
+                parse_filter(){
+                    const NClass_name_col = global_config.NClass_name_col;
+                    d3.csv(global_config.data_path).then(raw_data => { 
+                        const filtered_data = raw_data.map(item => ({
+                            [NClass_name_col]: item[NClass_name_col]
+                        }));
+                        
+                        filtered_data.forEach(item => {
+                            const class_name = item[NClass_name_col]
+                            if(!this.filter_mode_set.has(class_name)){
+                                this.filter_mode_set.add(class_name);
+                                this.filter_mode.push(class_name);
+                            }
+                        });
+                    });
+                },
+
+                handle_filter_change(selected_values){
+                    draw_map(false, this.filter_mode, this.view_mode);
+                },
+
+                handle_resize(){
+                    if (this.resize_timer) clearTimeout(this.resize_timer);
+                    this.resize_timer = setTimeout(() => {
+                        draw_map(false, this.filter_mode, this.view_mode);
+                    }, 200);
+                },
+
+                handle_view_mode_change(){
+                    this.view_mode = !this.view_mode;
+                    draw_map(false, this.filter_mode, this.view_mode);
+                },
+
+                close_side_bar(){
+                    d3.select("#map-sidebar")
+                    .classed("sidebar-active", false)
+                    .classed("sidebar-hide", true);
+                },
+
+                map_refresh(){
+                    draw_map(false, this.filter_mode, this.view_mode);
+                }
+            }
+        });
+        app.use(ElementPlus);
+        const mapVm = app.mount('#map-section');
+
+        // ==================== MAP CROSS GRAPH API START ====================
+        window.MapCrossGraph = {
+            focusClass(className) {
+                const normalized = String(className || "").trim().toUpperCase();
+                if (!normalized || normalized === "MAP") return;
+
+                const availableClasses = Array.from(mapVm.filter_mode_set || []);
+                if (!availableClasses.length) {
+                    window.setTimeout(() => this.focusClass(normalized), 250);
+                    return;
+                }
+
+                if (!availableClasses.includes(normalized)) {
+                    const mapContainer = document.querySelector("#map-section .chart-container");
+                    if (mapContainer) {
+                        mapContainer.classList.remove("cross-graph-pulse");
+                        void mapContainer.offsetWidth;
+                        mapContainer.classList.add("cross-graph-pulse");
+                    }
+                    return;
+                }
+
+                mapVm.filter_mode = [normalized];
+                mapVm.show_filter = true;
+                mapVm.close_side_bar();
+                draw_map(false, mapVm.filter_mode, mapVm.view_mode);
+            },
+            focusSpecies(species) {
+                if (!species) return;
+                window.MapCrossGraphPendingSpecies = species;
+                this.focusClass(species.filterName || species.imageKey || species.name);
+            },
+            reset() {
+                window.MapCrossGraphPendingSpecies = null;
+                mapVm.filter_mode = Array.from(mapVm.filter_mode_set || []);
+                mapVm.close_side_bar();
+                draw_map(false, mapVm.filter_mode, mapVm.view_mode);
+            }
+        };
+        // ==================== MAP CROSS GRAPH API END ====================
+    </script>
+
 </body>
-
-
-<!-- import d3js and vue packs -->
-<script src="https://d3js.org/d3.v5.min.js"></script>
-<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
-<script src="https://unpkg.com/topojson-client@3"></script>
-<script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/echarts/map/js/world.js"></script>
-
-<script type="module" src="./js/main.js"></script>
 </html>
+
+
+

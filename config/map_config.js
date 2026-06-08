@@ -1,7 +1,5 @@
 //Decoupling makes easy to manage variables
 export const map_config = {
-    data_path: "../data/extinction.csv",
-    continent_path:"../data/continents2.csv",
     // N categorized as name
     NLocation_col: "location_clean",
     NLocation_detail_col: "location_detail_clean",
@@ -9,5 +7,7 @@ export const map_config = {
     NCountry_alpha_col: "alpha-2",
     NCountry_code_col: "country_code",
     NRegion_code_col: "sub-region-code",
-    NRegion_name_col: "sub-region"
+    NRegion_name_col: "sub-region",
+    //name
+    NMap_container: "#map-container"
 }
